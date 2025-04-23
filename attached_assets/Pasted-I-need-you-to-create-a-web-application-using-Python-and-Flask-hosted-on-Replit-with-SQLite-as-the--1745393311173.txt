@@ -1,0 +1,128 @@
+I need you to create a web application using Python and Flask, hosted on Replit, with SQLite as the database. The application is for reporting and managing medical device faults in a small-scale environment (max 5 concurrent users) on a low-spec server. Below are the detailed requirements:
+
+### Application Overview
+The app allows users to report faults in medical devices, manage devices, and generate reports. It has two user roles: Technicians and Admins. The UI should be simple, modern, and inspired by AWS branding (orange, white, gray color scheme). Use Bootstrap for responsive design.
+
+### Features
+1. **Login System**:
+   - Users (Technicians and Admins) log in using email and password.
+   - Passwords are hashed (use bcrypt).
+   - Password reset via email.
+   - Technician profile page: displays email (non-editable), name, and phone number (editable).
+
+2. **Fault Reporting (General Users)**:
+   - A form with:
+     - Device name (required, text).
+     - Serial number (optional, text).
+     - Unit name (required, dropdown populated from Units table).
+     - Fault description (optional, textarea).
+     - Submit button.
+   - On submission:
+     - Save report to database with timestamp (`created_at`).
+     - Send email notification to all Technicians with report details (use smtplib with Gmail SMTP).
+     - Display success message.
+
+3. **Technician Features**:
+   - View all fault reports (table format: device name, unit, serial number, description, status, created_at).
+   - Respond to reports with "action taken" and save response with timestamp (`resolved_at`).
+   - Add new devices via a form:
+     - Serial number (required).
+     - Device name (required).
+     - Device type (required).
+     - Model (required).
+     - Unit (dropdown, required).
+     - Category (dropdown, required).
+     - Origin country (optional).
+     - Status (default: Working).
+     - Description (optional).
+   - Update device details.
+
+4. **Admin Features**:
+   - Add new users (email, name, phone number, role, password).
+   - Add/update units and devices (same fields as Technician).
+   - Generate reports:
+     - Fault reports within a date range (table: device, unit, fault description, action taken, timestamps).
+     - Device inventory report (e.g., devices by type, count of working vs. faulty).
+   - Dashboard with statistics (e.g., total devices, working vs. faulty).
+
+5. **Email Notifications**:
+   - When a fault is reported, notify all Technicians via email with report details.
+   - Store notification details in the database.
+
+### Database Schema
+Use SQLite with the following tables:
+1. **Units**:
+   - unit_id (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+   - unit_name (TEXT, NOT NULL, UNIQUE)
+   - phone_numbers (TEXT, nullable)
+
+2. **Devices**:
+   - device_id (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+   - serial_number (TEXT, NOT NULL)
+   - device_name (TEXT, NOT NULL)
+   - device_type (TEXT, NOT NULL)
+   - model (TEXT, NOT NULL)
+   - unit_id (INTEGER, FOREIGN KEY → Units, NOT NULL)
+   - category (TEXT, NOT NULL)
+   - origin_country (TEXT, nullable)
+   - status (TEXT, NOT NULL, DEFAULT 'Working')
+   - description (TEXT, nullable)
+   - PRIMARY KEY (serial_number, unit_id)
+
+3. **Users**:
+   - user_id (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+   - email (TEXT, NOT NULL, UNIQUE)
+   - password_hash (TEXT, NOT NULL)
+   - name (TEXT, NOT NULL)
+   - phone_number (TEXT, nullable)
+   - role (TEXT, NOT NULL, 'Technician' or 'Admin')
+   - unit_id (INTEGER, FOREIGN KEY → Units, nullable)
+
+4. **Reports**:
+   - report_id (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+   - device_id (INTEGER, FOREIGN KEY → Devices, NOT NULL)
+   - unit_id (INTEGER, FOREIGN KEY → Units, NOT NULL)
+   - serial_number (TEXT, nullable)
+   - fault_description (TEXT, nullable)
+   - created_at (DATETIME, NOT NULL)
+   - status (TEXT, NOT NULL, DEFAULT 'Pending')
+   - action_taken (TEXT, nullable)
+   - resolved_at (DATETIME, nullable)
+   - technician_id (INTEGER, FOREIGN KEY → Users, nullable)
+
+5. **Notifications**:
+   - notification_id (INTEGER, PRIMARY KEY, AUTOINCREMENT)
+   - report_id (INTEGER, FOREIGN KEY → Reports, NOT NULL)
+   - user_id (INTEGER, FOREIGN KEY → Users, NOT NULL)
+   - sent_at (DATETIME, NOT NULL)
+   - email_content (TEXT, NOT NULL)
+
+### UI Design
+- Use Bootstrap with AWS-inspired colors (orange: #FF9900, white: #FFFFFF, gray: #232F3E).
+- Simple, clean layout with a navigation bar (Login, Report Fault, Profile for Technicians, Admin Dashboard for Admins).
+- Responsive design for mobile and desktop.
+- Forms should have client-side validation (e.g., required fields).
+
+### Technical Requirements
+- Use Flask for the backend.
+- SQLite for the database (use SQLAlchemy for ORM).
+- Hash passwords with bcrypt.
+- Use smtplib for email notifications (configure with Gmail SMTP).
+- Deploy on Replit for development and testing.
+- Ensure the app is lightweight for a low-spec server.
+- Include basic error handling (e.g., invalid input, database errors).
+- Secure the app with session management and CSRF protection.
+
+### Deliverables
+- Complete Flask project structure with:
+  - `app.py` (main application).
+  - `templates/` (HTML files for UI).
+  - `static/` (CSS, JavaScript, Bootstrap).
+  - `models.py` (SQLAlchemy models for database).
+  - `routes.py` (Flask routes for all features).
+  - `config.py` (configuration for SMTP, database, etc.).
+- Initialize the database with sample data (2 units, 5 devices, 2 users: 1 Admin, 1 Technician).
+- README with setup and running instructions.
+- Ensure the app runs on Replit without errors.
+
+Please create the full application based on these specifications. Provide the code and instructions to run it on Replit.
