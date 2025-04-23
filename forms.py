@@ -95,6 +95,40 @@ class UnitForm(FlaskForm):
     phone_numbers = StringField('Phone Numbers', validators=[Optional()])
     submit = SubmitField('Save Unit')
 
+class DeviceFilterForm(FlaskForm):
+    unit_id = SelectField('Unit', coerce=int, validators=[Optional()])
+    category = SelectField('Category', choices=[
+        ('', 'All Categories'),
+        ('Diagnostic', 'Diagnostic'), 
+        ('Therapeutic', 'Therapeutic'),
+        ('Monitoring', 'Monitoring'),
+        ('Life Support', 'Life Support'),
+        ('Laboratory', 'Laboratory'),
+        ('Other', 'Other')
+    ], validators=[Optional()])
+    status = SelectField('Status', choices=[
+        ('', 'All Statuses'),
+        ('Working', 'Working'),
+        ('Faulty', 'Faulty'),
+        ('Under Maintenance', 'Under Maintenance'),
+        ('Out of Service', 'Out of Service')
+    ], validators=[Optional()])
+    model = StringField('Model', validators=[Optional()])
+    origin_country = StringField('Manufacturer/Country', validators=[Optional()])
+    search = StringField('Search', validators=[Optional()])
+    submit = SubmitField('Filter')
+    
+    def __init__(self, *args, **kwargs):
+        super(DeviceFilterForm, self).__init__(*args, **kwargs)
+        self.unit_id.choices = [(0, 'All Units')] + [(u.unit_id, u.unit_name) for u in Unit.query.all()]
+
+class ExcelUploadForm(FlaskForm):
+    excel_file = FileField('Excel File', validators=[
+        DataRequired(),
+        FileAllowed(['xlsx', 'xls'], 'Excel files only!')
+    ])
+    submit = SubmitField('Upload and Import')
+
 class ReportGenerationForm(FlaskForm):
     report_type = SelectField('Report Type', choices=[
         ('fault_reports', 'Fault Reports'),

@@ -2,18 +2,19 @@ from datetime import datetime
 from flask import render_template, redirect, url_for, flash, request, jsonify, abort, session
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import func
+import pandas as pd
+import os
 from app import db, login_manager
 from models import User, Unit, Device, Report, Notification
 from forms import (
     LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm,
     ProfileForm, FaultReportForm, ReportResponseForm, DeviceForm, UnitForm,
-    ReportGenerationForm
+    ReportGenerationForm, DeviceFilterForm, ExcelUploadForm
 )
 from wtforms.validators import Optional, EqualTo
 from utils import send_password_reset_email, send_fault_notification_email, admin_required
 from lang import set_locale, with_language, get_locale
 from config import Config
-import os
 
 def register_routes(app):
     
@@ -216,22 +217,79 @@ def register_routes(app):
             report.resolved_at = datetime.utcnow()
             report.status = 'Resolved'
             report.technician_id = current_user.user_id
+            
+            # Handle file upload
+            if form.photo_report.data:
+                # Create uploads directory if it doesn't exist
+                uploads_dir = os.path.join(os.getcwd(), 'static', 'uploads')
+                if not os.path.exists(uploads_dir):
+                    os.makedirs(uploads_dir)
+                
+                # Generate a unique filename with timestamp
+                filename = f"report_{report_id}_{int(datetime.now().timestamp())}"
+                file_ext = os.path.splitext(form.photo_report.data.filename)[1]
+                safe_filename = filename + file_ext
+                
+                # Save the file
+                filepath = os.path.join(uploads_dir, safe_filename)
+                form.photo_report.data.save(filepath)
+                
+                # Save the relative path to the database
+                report.photo_report = os.path.join('uploads', safe_filename)
+            
             db.session.commit()
             flash('Response submitted successfully!', 'success')
             return redirect(url_for('report_list'))
         
         return render_template('report_detail.html', title='Report Details', report=report, form=form)
     
-    @app.route('/device_list')
+    @app.route('/device_list', methods=['GET', 'POST'])
     @login_required
     def device_list():
+        form = DeviceFilterForm(request.args)
+        
+        # Build query with filters
+        query = Device.query
+        
+        # Apply filters if form is submitted
+        if request.args:
+            # Filter by unit
+            if form.unit_id.data and form.unit_id.data != 0:
+                query = query.filter(Device.unit_id == form.unit_id.data)
+            
+            # Filter by category
+            if form.category.data:
+                query = query.filter(Device.category == form.category.data)
+            
+            # Filter by status
+            if form.status.data:
+                query = query.filter(Device.status == form.status.data)
+            
+            # Filter by model (partial match)
+            if form.model.data:
+                query = query.filter(Device.model.ilike(f'%{form.model.data}%'))
+            
+            # Filter by manufacturer/country (partial match)
+            if form.origin_country.data:
+                query = query.filter(Device.origin_country.ilike(f'%{form.origin_country.data}%'))
+            
+            # General search across multiple fields
+            if form.search.data:
+                search_term = f"%{form.search.data}%"
+                query = query.filter(
+                    (Device.device_name.ilike(search_term)) | 
+                    (Device.device_type.ilike(search_term)) |
+                    (Device.serial_number.ilike(search_term)) |
+                    (Device.description.ilike(search_term))
+                )
+        
         # Get devices with pagination
         page = request.args.get('page', 1, type=int)
-        devices = Device.query.order_by(Device.device_name).paginate(
+        devices = query.order_by(Device.device_name).paginate(
             page=page, per_page=10, error_out=False
         )
         
-        return render_template('device_list.html', title='Device List', devices=devices)
+        return render_template('device_list.html', title='Device List', devices=devices, form=form)
     
     @app.route('/device_add', methods=['GET', 'POST'])
     @login_required
@@ -265,6 +323,115 @@ def register_routes(app):
             return redirect(url_for('device_list'))
         
         return render_template('device_add.html', title='Add Device', form=form)
+        
+    @app.route('/device_import', methods=['GET', 'POST'])
+    @login_required
+    @admin_required
+    def device_import():
+        form = ExcelUploadForm()
+        
+        if form.validate_on_submit():
+            # Save the uploaded file temporarily
+            uploaded_file = form.excel_file.data
+            file_path = os.path.join(os.getcwd(), 'temp_import.xlsx')
+            uploaded_file.save(file_path)
+            
+            try:
+                # Read Excel file
+                df = pd.read_excel(file_path)
+                
+                # Required columns
+                required_columns = ['serial_number', 'device_name', 'device_type', 'model', 
+                                   'unit_name', 'category', 'status']
+                
+                # Validate columns
+                for col in required_columns:
+                    if col not in df.columns:
+                        flash(f'Column {col} is missing in the Excel file.', 'danger')
+                        return redirect(url_for('device_import'))
+                
+                success_count = 0
+                error_count = 0
+                
+                # Process each row
+                for index, row in df.iterrows():
+                    try:
+                        # Find unit by name
+                        unit = Unit.query.filter_by(unit_name=row['unit_name']).first()
+                        
+                        # Skip if unit doesn't exist
+                        if not unit:
+                            error_count += 1
+                            continue
+                        
+                        # Check if device already exists
+                        existing_device = Device.query.filter_by(
+                            serial_number=row['serial_number'],
+                            unit_id=unit.unit_id
+                        ).first()
+                        
+                        if existing_device:
+                            # Update existing device
+                            existing_device.device_name = row['device_name']
+                            existing_device.device_type = row['device_type']
+                            existing_device.model = row['model']
+                            existing_device.category = row['category']
+                            existing_device.status = row['status']
+                            
+                            # Optional columns
+                            if 'origin_country' in df.columns and not pd.isna(row['origin_country']):
+                                existing_device.origin_country = row['origin_country']
+                            
+                            if 'description' in df.columns and not pd.isna(row['description']):
+                                existing_device.description = row['description']
+                                
+                            success_count += 1
+                            
+                        else:
+                            # Create new device
+                            device = Device(
+                                serial_number=row['serial_number'],
+                                device_name=row['device_name'],
+                                device_type=row['device_type'],
+                                model=row['model'],
+                                unit_id=unit.unit_id,
+                                category=row['category'],
+                                status=row['status']
+                            )
+                            
+                            # Optional columns
+                            if 'origin_country' in df.columns and not pd.isna(row['origin_country']):
+                                device.origin_country = row['origin_country']
+                            
+                            if 'description' in df.columns and not pd.isna(row['description']):
+                                device.description = row['description']
+                                
+                            db.session.add(device)
+                            success_count += 1
+                            
+                    except Exception as e:
+                        error_count += 1
+                        
+                # Commit all changes
+                db.session.commit()
+                
+                # Clean up the temporary file
+                os.remove(file_path)
+                
+                if error_count > 0:
+                    flash(f'Imported {success_count} devices with {error_count} errors.', 'warning')
+                else:
+                    flash(f'Successfully imported {success_count} devices.', 'success')
+                    
+                return redirect(url_for('device_list'))
+                
+            except Exception as e:
+                flash(f'Error processing Excel file: {str(e)}', 'danger')
+                # Clean up in case of error
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                    
+        return render_template('device_import.html', title='Import Devices', form=form)
     
     @app.route('/device_edit/<int:device_id>', methods=['GET', 'POST'])
     @login_required

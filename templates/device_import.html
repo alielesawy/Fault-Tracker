@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ _('Import Devices from Excel') }}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ _('Instructions') }}</h5>
+            <p>{{ _('Upload an Excel file (.xlsx or .xls) containing device information.') }}</p>
+            <p>{{ _('Required columns:') }}</p>
+            <ul>
+                <li><code>serial_number</code> - {{ _('Device serial number') }}</li>
+                <li><code>device_name</code> - {{ _('Device name') }}</li>
+                <li><code>device_type</code> - {{ _('Device type') }}</li>
+                <li><code>model</code> - {{ _('Device model') }}</li>
+                <li><code>unit_name</code> - {{ _('Unit name (must match existing unit)') }}</li>
+                <li><code>category</code> - {{ _('Category (Diagnostic, Therapeutic, Monitoring, Life Support, Laboratory, Other)') }}</li>
+                <li><code>status</code> - {{ _('Status (Working, Faulty, Under Maintenance, Out of Service)') }}</li>
+            </ul>
+            <p>{{ _('Optional columns:') }}</p>
+            <ul>
+                <li><code>origin_country</code> - {{ _('Country of origin/manufacturer') }}</li>
+                <li><code>description</code> - {{ _('Additional description') }}</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group mb-3">
+                    {{ form.excel_file.label(class="form-label") }}
+                    {{ form.excel_file(class="form-control") }}
+                    {% if form.excel_file.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in form.excel_file.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {{ form.submit(class="btn btn-primary") }}
+                <a href="{{ url_for('device_list') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
