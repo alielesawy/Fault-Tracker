@@ -3,16 +3,67 @@
 {% block title %}Device List - Medical Device Management{% endblock %}
 
 {% block content %}
-<div class="card">
+<div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2>Device List</h2>
-        <a href="{{ url_for('device_add') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Add Device
-        </a>
+        <h2>{{ _('Device List') }}</h2>
+        <div>
+            <a href="{{ url_for('device_add') }}" class="btn btn-primary me-2">
+                <i class="fas fa-plus me-2"></i>{{ _('Add Device') }}
+            </a>
+            {% if current_user.role == 'Admin' %}
+            <a href="{{ url_for('device_import') }}" class="btn btn-success">
+                <i class="fas fa-file-import me-2"></i>{{ _('Import Excel') }}
+            </a>
+            {% endif %}
+        </div>
     </div>
     <div class="card-body">
-        <div class="mb-3">
-            <input type="text" id="tableFilter" class="form-control" placeholder="Search devices..." data-table="#devicesTable">
+        <!-- Filter Form -->
+        <div class="mb-4">
+            <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false">
+                <i class="fas fa-filter me-2"></i>{{ _('Show/Hide Filters') }}
+            </button>
+            
+            <div class="collapse {% if request.args %}show{% endif %}" id="filterCollapse">
+                <div class="card card-body bg-light">
+                    <form method="GET" action="{{ url_for('device_list') }}" class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.unit_id.label(class="form-label") }}
+                            {{ form.unit_id(class="form-select") }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.category.label(class="form-label") }}
+                            {{ form.category(class="form-select") }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.status.label(class="form-label") }}
+                            {{ form.status(class="form-select") }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.model.label(class="form-label") }}
+                            {{ form.model(class="form-control") }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.origin_country.label(class="form-label") }}
+                            {{ form.origin_country(class="form-control") }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.search.label(class="form-label") }}
+                            {{ form.search(class="form-control", placeholder=_("Search in name, type, serial number...")) }}
+                        </div>
+                        
+                        <div class="col-12">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('device_list') }}" class="btn btn-secondary">{{ _('Clear Filters') }}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         
         {% if devices.items %}

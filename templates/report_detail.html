@@ -94,19 +94,50 @@
                     </div>
                 {% endif %}
                 
+                {% if report.photo_report %}
+                    <div class="mb-4">
+                        <h5>{{ _('Technical Report Photo') }}</h5>
+                        <div class="p-3 bg-light rounded text-center">
+                            {% if report.photo_report.endswith('.pdf') %}
+                                <p>
+                                    <a href="{{ url_for('static', filename=report.photo_report) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-file-pdf me-2"></i>{{ _('View PDF Report') }}
+                                    </a>
+                                </p>
+                            {% else %}
+                                <img src="{{ url_for('static', filename=report.photo_report) }}" alt="Technical report" class="img-fluid rounded border" style="max-height: 300px;">
+                                <p class="mt-2">
+                                    <a href="{{ url_for('static', filename=report.photo_report) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-external-link-alt me-2"></i>{{ _('View Full Size') }}
+                                    </a>
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+                
                 {% if report.status == 'Pending' %}
                     <div class="card mt-4">
                         <div class="card-header">
-                            <h5 class="mb-0">Respond to Report</h5>
+                            <h5 class="mb-0">{{ _('Respond to Report') }}</h5>
                         </div>
                         <div class="card-body">
-                            <form method="POST" action="{{ url_for('report_detail', report_id=report.report_id) }}">
+                            <form method="POST" action="{{ url_for('report_detail', report_id=report.report_id) }}" enctype="multipart/form-data">
                                 {{ form.hidden_tag() }}
                                 
                                 <div class="mb-3">
                                     {{ form.action_taken.label(class="form-label") }} *
-                                    {{ form.action_taken(class="form-control" + (" is-invalid" if form.action_taken.errors else ""), rows=5, placeholder="Describe what action was taken to resolve the issue") }}
+                                    {{ form.action_taken(class="form-control" + (" is-invalid" if form.action_taken.errors else ""), rows=5, placeholder=_("Describe what action was taken to resolve the issue")) }}
                                     {% for error in form.action_taken.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {{ form.photo_report.label(class="form-label") }}
+                                    {{ form.photo_report(class="form-control" + (" is-invalid" if form.photo_report.errors else "")) }}
+                                    <div class="form-text">{{ _('Upload a photo of handwritten technical report or PDF document (optional)') }}</div>
+                                    {% for error in form.photo_report.errors %}
                                         <div class="invalid-feedback">{{ error }}</div>
                                     {% endfor %}
                                 </div>
@@ -147,9 +178,15 @@
             <div class="card-body">
                 <p><strong>{{ report.unit.unit_name }}</strong></p>
                 {% if report.unit.phone_numbers %}
-                    <p><i class="fas fa-phone me-2"></i>{{ report.unit.phone_numbers }}</p>
+                    <p>
+                        <i class="fas fa-phone me-2"></i>
+                        {% set phone_list = report.unit.phone_numbers.split(',') %}
+                        {% for phone in phone_list %}
+                            <a href="tel:{{ phone.strip() }}" class="text-decoration-none">{{ phone.strip() }}</a>{% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </p>
                 {% else %}
-                    <p class="text-muted"><i class="fas fa-phone me-2"></i>No phone number available</p>
+                    <p class="text-muted"><i class="fas fa-phone me-2"></i>{{ _('No phone number available') }}</p>
                 {% endif %}
             </div>
         </div>
