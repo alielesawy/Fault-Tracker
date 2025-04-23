@@ -12,8 +12,16 @@
   --border-color: #e6e6e6;
 }
 
+@font-face {
+  font-family: 'FS Albert Arabic';
+  src: url('../fonts/FSAlbertArabic-Regular.woff2') format('woff2'),
+       url('../fonts/FSAlbertArabic-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'FS Albert Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Navbar styling */
@@ -159,7 +167,7 @@ footer {
 
 /* Arabic font improvements */
 [dir="rtl"] body {
-  font-family: 'Segoe UI', 'Arial', 'Tahoma', sans-serif;
+  font-family: 'FS Albert Arabic', 'Segoe UI', 'Arial', 'Tahoma', sans-serif;
   font-size: 1.02rem;
   line-height: 1.6;
 }
@@ -201,11 +209,48 @@ footer {
 .status-pending {
   font-weight: bold;
   color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .status-resolved {
   font-weight: bold;
   color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* Fix for status text on white background */
+.badge {
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  color: #fff !important;
+}
+
+.badge-primary {
+  background-color: var(--primary-color);
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529 !important;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
 }
 
 /* Language switcher */

@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, HiddenField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Optional
 from models import User, Unit, Device
@@ -43,9 +44,9 @@ class ProfileForm(FlaskForm):
     submit = SubmitField('Update Profile')
 
 class FaultReportForm(FlaskForm):
+    unit_id = SelectField('Unit', coerce=int, validators=[DataRequired()])
     device_name = StringField('Device Name', validators=[DataRequired()])
     serial_number = StringField('Serial Number', validators=[Optional()])
-    unit_id = SelectField('Unit', coerce=int, validators=[DataRequired()])
     fault_description = TextAreaField('Fault Description', validators=[Optional()])
     submit = SubmitField('Submit Report')
     
@@ -55,6 +56,10 @@ class FaultReportForm(FlaskForm):
 
 class ReportResponseForm(FlaskForm):
     action_taken = TextAreaField('Action Taken', validators=[DataRequired()])
+    photo_report = FileField('Technical Report Photo', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'jpeg', 'png', 'pdf'], 'Images and PDF only!')
+    ])
     submit = SubmitField('Submit Response')
 
 class DeviceForm(FlaskForm):

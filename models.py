@@ -89,6 +89,7 @@ class Report(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     status = db.Column(db.String(20), nullable=False, default='Pending')
     action_taken = db.Column(db.Text, nullable=True)
+    photo_report = db.Column(db.String(255), nullable=True)  # Path to the uploaded photo
     resolved_at = db.Column(db.DateTime, nullable=True)
     technician_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=True)
     

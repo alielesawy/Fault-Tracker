@@ -9,6 +9,7 @@ from forms import (
     ProfileForm, FaultReportForm, ReportResponseForm, DeviceForm, UnitForm,
     ReportGenerationForm
 )
+from wtforms.validators import Optional, EqualTo
 from utils import send_password_reset_email, send_fault_notification_email, admin_required
 from lang import set_locale, with_language, get_locale
 from config import Config
@@ -509,9 +510,9 @@ def register_routes(app):
         user = User.query.get_or_404(user_id)
         form = RegistrationForm(obj=user)
         
-        # Remove password validation for edit
-        del form.password.validators[:]
-        del form.password2.validators[:]
+        # Remove password validation for edit by setting optional validators
+        form.password.validators = [Optional()]
+        form.password2.validators = [Optional(), EqualTo('password')]
         
         if form.validate_on_submit():
             # Check if another user with same email exists
