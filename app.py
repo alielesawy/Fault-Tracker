@@ -54,6 +54,15 @@ app.config.from_object(Config)
 # Import language helper
 from lang import get_text, with_language
 
+# Define nl2br filter to convert newlines to <br> tags
+def nl2br(value):
+    if value:
+        return value.replace('\n', '<br>')
+    return ''
+
+# Register Jinja2 filters
+app.jinja_env.filters['nl2br'] = nl2br
+
 # Setup template context processor to make translations available in templates
 @app.context_processor
 def inject_language_functions():

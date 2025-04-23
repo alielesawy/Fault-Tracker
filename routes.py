@@ -143,6 +143,11 @@ def register_routes(app):
     
     @app.route('/fault_report', methods=['GET', 'POST'])
     def fault_report():
+        # Only allow non-logged in users to access the fault report form
+        if current_user.is_authenticated:
+            flash('Logged in users should use the admin interface to manage faults.', 'info')
+            return redirect(url_for('index'))
+            
         form = FaultReportForm()
         if form.validate_on_submit():
             # Check if device exists
@@ -317,10 +322,13 @@ def register_routes(app):
         pending_reports = Report.query.filter_by(status='Pending').count()
         resolved_reports = Report.query.filter_by(status='Resolved').count()
         
-        # Get device categories
-        device_categories = db.session.query(
+        # Get device categories - convert to serializable format
+        device_categories_query = db.session.query(
             Device.category, func.count(Device.device_id)
         ).group_by(Device.category).all()
+        
+        # Convert SQLAlchemy Row objects to a serializable format
+        device_categories = [{'category': category, 'count': count} for category, count in device_categories_query]
         
         # Get units
         units = Unit.query.all()
@@ -477,12 +485,19 @@ def register_routes(app):
                     Device.category, func.count(Device.device_id)
                 ).group_by(Device.category).all()
                 
+                # Convert to serializable format
+                devices_list = [(device, unit) for device, unit in report_data]
+                
+                by_type_list = [{'type': type_name, 'count': count} for type_name, count in device_by_type]
+                by_status_list = [{'status': status_name, 'count': count} for status_name, count in device_by_status]
+                by_category_list = [{'category': category_name, 'count': count} for category_name, count in device_by_category]
+                
                 # Add summary data to report_data
                 report_data = {
-                    'devices': report_data,
-                    'by_type': device_by_type,
-                    'by_status': device_by_status,
-                    'by_category': device_by_category
+                    'devices': devices_list,
+                    'by_type': by_type_list,
+                    'by_status': by_status_list,
+                    'by_category': by_category_list
                 }
         
         return render_template('admin/reports.html', title='Reports', form=form, report_data=report_data, report_type=report_type)
