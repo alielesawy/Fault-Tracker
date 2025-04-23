@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import render_template, redirect, url_for, flash, request, jsonify, abort
+from flask import render_template, redirect, url_for, flash, request, jsonify, abort, session
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import func
 from app import db, login_manager
@@ -10,6 +10,8 @@ from forms import (
     ReportGenerationForm
 )
 from utils import send_password_reset_email, send_fault_notification_email, admin_required
+from lang import set_locale, with_language, get_locale
+from config import Config
 import os
 
 def register_routes(app):
@@ -17,6 +19,22 @@ def register_routes(app):
     @app.context_processor
     def inject_now():
         return {'now': datetime.now()}
+    
+    # Set Arabic as the default language for all routes
+    @app.before_request
+    @with_language
+    def before_request():
+        # If no language is set in session, set it to default (Arabic)
+        if 'language' not in session:
+            set_locale(Config.DEFAULT_LANGUAGE)
+    
+    # Route to change language
+    @app.route('/set_language/<lang>')
+    def set_language(lang):
+        # Validate language
+        if lang in Config.LANGUAGES:
+            set_locale(lang)
+        return redirect(request.referrer or url_for('index'))
     
     @app.route('/')
     def index():
