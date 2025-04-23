@@ -1,0 +1,176 @@
+# نظام إدارة أعطال الأجهزة الطبية (Medical Device Fault Management System)
+
+نظام ويب متكامل لإدارة الأجهزة الطبية وتتبع الأعطال والإصلاحات في المنشآت الصحية.
+
+## الميزات الرئيسية
+
+- تسجيل الأعطال في الأجهزة الطبية
+- إدارة الأجهزة والوحدات الطبية
+- تتبع حالة الأعطال والإصلاحات
+- لوحة تحكم للمشرفين مع تقارير وإحصاءات
+- إشعارات البريد الإلكتروني للفنيين
+- واجهة مستخدم متجاوبة للهواتف المحمولة
+
+## المتطلبات التقنية
+
+- Python 3.8+
+- Flask
+- PostgreSQL
+- SendGrid للإشعارات بالبريد الإلكتروني (اختياري)
+
+## كيفية التثبيت
+
+### 1. تجهيز بيئة التطوير
+
+```bash
+# تثبيت Python وإنشاء بيئة افتراضية (اختياري)
+python -m venv venv
+source venv/bin/activate  # لينكس/ماك
+# أو للويندوز
+# venv\Scripts\activate
+
+# تثبيت المكتبات المطلوبة
+pip install -r requirements.txt
+```
+
+### 2. إعداد قاعدة البيانات
+
+```bash
+# إنشاء قاعدة بيانات PostgreSQL
+createdb medical_device_management
+
+# تهيئة متغيرات البيئة
+export DATABASE_URL=postgresql://username:password@localhost:5432/medical_device_management
+export SESSION_SECRET=your_secure_secret_key
+```
+
+### 3. تشغيل التطبيق
+
+```bash
+# تشغيل المخدم التطويري
+gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+```
+
+## بيانات تسجيل الدخول للاختبار
+
+- **مدير النظام**:
+  - البريد الإلكتروني: admin@example.com
+  - كلمة المرور: admin123
+
+- **فني**:
+  - البريد الإلكتروني: tech@example.com
+  - كلمة المرور: tech123
+
+## إعداد بيئة الإنتاج
+
+### 1. تثبيت المتطلبات على الخادم
+
+```bash
+# تثبيت المكتبات المطلوبة
+sudo apt update
+sudo apt install python3 python3-pip python3-venv postgresql nginx
+
+# إنشاء بيئة افتراضية
+python3 -m venv /var/www/medical_device_system/venv
+source /var/www/medical_device_system/venv/bin/activate
+
+# تثبيت المكتبات
+pip install -r requirements.txt
+pip install gunicorn
+```
+
+### 2. إعداد قاعدة البيانات في بيئة الإنتاج
+
+```bash
+# إنشاء مستخدم وقاعدة بيانات PostgreSQL
+sudo -u postgres psql
+CREATE USER medical_user WITH PASSWORD 'secure_password';
+CREATE DATABASE medical_device_management OWNER medical_user;
+\q
+```
+
+### 3. إعداد متغيرات البيئة
+
+أنشئ ملف متغيرات البيئة في `/etc/environment` أو إضافة إلى ملف `/etc/systemd/system/medical-device-app.service`:
+
+```
+DATABASE_URL=postgresql://medical_user:secure_password@localhost:5432/medical_device_management
+SESSION_SECRET=your_secure_secret_key
+ADMIN_EMAIL=your_admin@example.com
+ADMIN_PASSWORD=your_admin_password
+MAIL_SERVER=smtp.yourserver.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@example.com
+MAIL_PASSWORD=your_email_password
+MAIL_DEFAULT_SENDER=noreply@yourcompany.com
+SENDGRID_API_KEY=your_sendgrid_api_key
+```
+
+### 4. إعداد خدمة النظام لتشغيل التطبيق
+
+إنشاء ملف `/etc/systemd/system/medical-device-app.service`:
+
+```
+[Unit]
+Description=Medical Device Management Application
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/medical_device_system
+Environment="PATH=/var/www/medical_device_system/venv/bin"
+ExecStart=/var/www/medical_device_system/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:5000 main:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+تفعيل وتشغيل الخدمة:
+```bash
+sudo systemctl enable medical-device-app
+sudo systemctl start medical-device-app
+```
+
+### 5. إعداد Nginx كوسيط عكسي
+
+إنشاء ملف `/etc/nginx/sites-available/medical-device-app`:
+
+```
+server {
+    listen 80;
+    server_name your_domain.com;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+تفعيل الموقع:
+```bash
+sudo ln -s /etc/nginx/sites-available/medical-device-app /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### 6. إعداد SSL/TLS (اختياري ولكن موصى به)
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d your_domain.com
+```
+
+## التعديلات التي تم إجراؤها
+
+1. **دعم اللغة العربية**: تمت إضافة ترجمات للواجهة باللغة العربية
+2. **تحسين توافق الهواتف المحمولة**: تم تحسين كافة الصفحات للعمل على الأجهزة المحمولة
+3. **إدارة الإشعارات**: تم إضافة خيارات إشعارات البريد الإلكتروني عبر SendGrid
+4. **أمان البيانات**: تم تحسين الأمان وتشفير كلمات المرور
+
+## التواصل والمساعدة
+
+للأسئلة أو المساعدة، يرجى التواصل عبر [your-email@example.com].
