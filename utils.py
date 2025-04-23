@@ -3,6 +3,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from functools import wraps
+from datetime import datetime
 from flask import flash, redirect, url_for
 from flask_login import current_user
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
@@ -193,17 +194,19 @@ def initialize_db():
     if User.query.first() is not None:
         return
     
-    # Add sample units
-    unit1 = Unit(unit_name="Emergency Room", phone_numbers="123-456-7890")
-    unit2 = Unit(unit_name="ICU", phone_numbers="123-456-7891")
+    # Add sample units with Arabic names
+    unit1 = Unit(unit_name="قسم الطوارئ", phone_numbers="123-456-7890")  # Emergency Room
+    unit2 = Unit(unit_name="العناية المركزة", phone_numbers="123-456-7891")  # ICU
+    unit3 = Unit(unit_name="قسم الأشعة", phone_numbers="123-456-7892")  # Radiology Department
     db.session.add(unit1)
     db.session.add(unit2)
+    db.session.add(unit3)
     db.session.flush()  # Get IDs without committing
     
     # Add sample users
     admin = User(
         email=Config.ADMIN_EMAIL,
-        name="Admin User",
+        name="مدير النظام",  # Admin User
         phone_number="123-456-7890",
         role="Admin"
     )
@@ -211,78 +214,125 @@ def initialize_db():
     
     tech = User(
         email="tech@example.com",
-        name="Tech User",
+        name="فني الصيانة",  # Technician
         phone_number="123-456-7891",
         role="Technician",
         unit_id=unit1.unit_id
     )
     tech.set_password("tech123")
     
+    tech2 = User(
+        email="tech2@example.com",
+        name="محمد أحمد",  # Second technician
+        phone_number="123-456-7892",
+        role="Technician",
+        unit_id=unit2.unit_id
+    )
+    tech2.set_password("tech123")
+    
     db.session.add(admin)
     db.session.add(tech)
+    db.session.add(tech2)
     db.session.flush()
     
-    # Add sample devices
+    # Add sample devices with Arabic descriptions
     devices = [
         Device(
             serial_number="SN001",
-            device_name="ECG Monitor",
-            device_type="Monitoring",
+            device_name="جهاز تخطيط القلب",  # ECG Monitor
+            device_type="مراقبة",  # Monitoring
             model="CardioMax 3000",
             unit_id=unit1.unit_id,
             category="Monitoring",
-            origin_country="USA",
+            origin_country="الولايات المتحدة",  # USA
             status="Working",
-            description="Cardiac monitoring device"
+            description="جهاز لمراقبة نشاط القلب الكهربائي"  # Cardiac monitoring device
         ),
         Device(
             serial_number="SN002",
-            device_name="Ventilator",
-            device_type="Life Support",
+            device_name="جهاز التنفس الصناعي",  # Ventilator
+            device_type="دعم الحياة",  # Life Support
             model="BreathAssist Pro",
             unit_id=unit2.unit_id,
             category="Life Support",
-            origin_country="Germany",
+            origin_country="ألمانيا",  # Germany
             status="Working",
-            description="Mechanical ventilation device"
+            description="جهاز للمساعدة في التنفس للمرضى"  # Mechanical ventilation device
         ),
         Device(
             serial_number="SN003",
-            device_name="Infusion Pump",
-            device_type="Therapeutic",
+            device_name="مضخة التسريب الوريدي",  # Infusion Pump
+            device_type="علاجي",  # Therapeutic
             model="FlowControl 200",
             unit_id=unit1.unit_id,
             category="Therapeutic",
-            origin_country="Japan",
+            origin_country="اليابان",  # Japan
             status="Working",
-            description="IV fluid and medication delivery"
+            description="جهاز لتسريب الأدوية والسوائل بمعدل محدد"  # IV fluid and medication delivery
         ),
         Device(
             serial_number="SN004",
-            device_name="X-Ray Machine",
-            device_type="Diagnostic",
+            device_name="جهاز الأشعة السينية",  # X-Ray Machine
+            device_type="تشخيصي",  # Diagnostic
             model="ClearView XR",
-            unit_id=unit2.unit_id,
+            unit_id=unit3.unit_id,
             category="Diagnostic",
-            origin_country="USA",
+            origin_country="الولايات المتحدة",  # USA
             status="Working",
-            description="Radiography imaging device"
+            description="جهاز تصوير بالأشعة السينية"  # Radiography imaging device
         ),
         Device(
             serial_number="SN005",
-            device_name="Patient Monitor",
-            device_type="Monitoring",
+            device_name="جهاز مراقبة المريض",  # Patient Monitor
+            device_type="مراقبة",  # Monitoring
             model="VitalTrack Pro",
             unit_id=unit1.unit_id,
             category="Monitoring",
-            origin_country="Sweden",
+            origin_country="السويد",  # Sweden
             status="Faulty",
-            description="Vital signs monitoring system"
+            description="جهاز لمراقبة العلامات الحيوية للمريض"  # Vital signs monitoring system
+        ),
+        Device(
+            serial_number="SN006",
+            device_name="جهاز الرنين المغناطيسي",  # MRI Machine
+            device_type="تشخيصي",  # Diagnostic
+            model="MagneticView 5000",
+            unit_id=unit3.unit_id,
+            category="Diagnostic",
+            origin_country="فرنسا",  # France
+            status="Working",
+            description="جهاز تصوير بالرنين المغناطيسي"  # MRI imaging device
         )
     ]
     
     for device in devices:
         db.session.add(device)
     
-    # Commit all changes
+    # Commit the devices first to get their IDs
     db.session.commit()
+    
+    # Now we can safely reference the device IDs
+    faulty_device = Device.query.filter_by(serial_number="SN005").first()
+    
+    if faulty_device:
+        # Add sample fault report
+        report = Report(
+            device_id=faulty_device.device_id,  # Faulty Patient Monitor
+            unit_id=unit1.unit_id,
+            serial_number="SN005",
+            fault_description="الشاشة لا تعمل والجهاز يصدر صوت إنذار متكرر",  # Screen not working and device making alarm sounds
+            created_at=datetime.utcnow(),
+            status='Pending'
+        )
+        db.session.add(report)
+        db.session.commit()
+        
+        # Create sample notification
+        notification = Notification(
+            report_id=report.report_id,
+            user_id=tech.user_id,
+            sent_at=datetime.utcnow(),
+            email_content="تم الإبلاغ عن عطل جديد في جهاز مراقبة المريض"  # New fault reported in Patient Monitor
+        )
+        db.session.add(notification)
+        db.session.commit()
