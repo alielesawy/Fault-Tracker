@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+
+{% block title %}Unit Management - Medical Device Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>{% if edit_unit %}Edit Unit{% else %}Add New Unit{% endif %}</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_unit_management') if not edit_unit else url_for('admin_edit_unit', unit_id=edit_unit.unit_id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.unit_name.label(class="form-label") }} *
+                        {{ form.unit_name(class="form-control" + (" is-invalid" if form.unit_name.errors else ""), placeholder="Enter unit name") }}
+                        {% for error in form.unit_name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.phone_numbers.label(class="form-label") }}
+                        {{ form.phone_numbers(class="form-control" + (" is-invalid" if form.phone_numbers.errors else ""), placeholder="Enter phone numbers") }}
+                        {% for error in form.phone_numbers.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        <div class="form-text">Multiple numbers can be separated by commas</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {% if edit_unit %}
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('admin_unit_management') }}" class="btn btn-secondary">Cancel</a>
+                                {{ form.submit(class="btn btn-primary", value="Update Unit") }}
+                            </div>
+                        {% else %}
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Units</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <input type="text" id="tableFilter" class="form-control" placeholder="Search units..." data-table="#unitsTable">
+                </div>
+                
+                {% if units %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="unitsTable">
+                            <thead>
+                                <tr>
+                                    <th>Unit Name</th>
+                                    <th>Phone Numbers</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for unit in units %}
+                                    <tr>
+                                        <td>{{ unit.unit_name }}</td>
+                                        <td>{{ unit.phone_numbers or 'N/A' }}</td>
+                                        <td>
+                                            <a href="{{ url_for('admin_edit_unit', unit_id=unit.unit_id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('admin_delete_unit', unit_id=unit.unit_id) }}" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-danger btn-delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        No units found. Add a unit using the form on the left.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+
+{% block title %}Fault Reports - Medical Device Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Fault Reports</h2>
+        <a href="{{ url_for('fault_report') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Report New Fault
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <input type="text" id="tableFilter" class="form-control" placeholder="Search reports..." data-table="#reportsTable">
+        </div>
+        
+        {% if reports.items %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="reportsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Device</th>
+                            <th>Unit</th>
+                            <th>Serial Number</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Reported</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports.items %}
+                            <tr>
+                                <td>{{ report.report_id }}</td>
+                                <td>{{ report.device.device_name }}</td>
+                                <td>{{ report.unit.unit_name }}</td>
+                                <td>{{ report.serial_number or report.device.serial_number }}</td>
+                                <td>
+                                    {% if report.fault_description %}
+                                        {{ report.fault_description|truncate(50) }}
+                                    {% else %}
+                                        <span class="text-muted">No description</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if report.status == 'Pending' %}badge-pending{% else %}badge-resolved{% endif %}">
+                                        {{ report.status }}
+                                    </span>
+                                </td>
+                                <td>{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('report_detail', report_id=report.report_id) }}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Report list pagination">
+                <ul class="pagination justify-content-center">
+                    {% if reports.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('report_list', page=reports.prev_num) }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    {% endif %}
+                    
+                    {% for page_num in reports.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if page_num == reports.page %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('report_list', page=page_num) }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if reports.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('report_list', page=reports.next_num) }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% else %}
+            <div class="alert alert-info">
+                No reports found. <a href="{{ url_for('fault_report') }}">Report a fault</a> to get started.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - Medical Device Management{% endblock %}
+
+{% block content %}
+<!-- Hero section -->
+<section class="hero">
+    <div class="container text-center py-5">
+        <h1 class="display-4 mb-4">Medical Device Fault Management</h1>
+        <p class="lead mb-4">A comprehensive solution for reporting and managing medical device faults in healthcare facilities.</p>
+        <a href="{{ url_for('fault_report') }}" class="btn btn-hero btn-lg">Report a Fault</a>
+    </div>
+</section>
+
+<!-- Main features -->
+<section class="container">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h3 class="card-title">Report Faults</h3>
+                    <p class="card-text">Quickly report issues with medical devices to ensure they get immediate attention.</p>
+                    <a href="{{ url_for('fault_report') }}" class="btn btn-primary">Report Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title">Track Devices</h3>
+                    <p class="card-text">Keep track of all medical devices, their status, and maintenance history.</p>
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('device_list') }}" class="btn btn-primary">View Devices</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Login to View</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
+                    <h3 class="card-title">Generate Reports</h3>
+                    <p class="card-text">Generate comprehensive reports on device faults and inventory status.</p>
+                    {% if current_user.is_authenticated and current_user.role == 'Admin' %}
+                    <a href="{{ url_for('admin_reports') }}" class="btn btn-primary">View Reports</a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">Admin Access</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section class="container mt-5">
+    <h2 class="text-center mb-4">How It Works</h2>
+    <div class="row">
+        <div class="col-md-3 text-center mb-4">
+            <div class="bg-light p-3 rounded">
+                <i class="fas fa-file-medical fa-2x text-primary mb-3"></i>
+                <h4>1. Report a Fault</h4>
+                <p>Submit details about the device and the issue encountered.</p>
+            </div>
+        </div>
+        <div class="col-md-3 text-center mb-4">
+            <div class="bg-light p-3 rounded">
+                <i class="fas fa-bell fa-2x text-primary mb-3"></i>
+                <h4>2. Notification</h4>
+                <p>Technicians receive instant notifications about new fault reports.</p>
+            </div>
+        </div>
+        <div class="col-md-3 text-center mb-4">
+            <div class="bg-light p-3 rounded">
+                <i class="fas fa-tools fa-2x text-primary mb-3"></i>
+                <h4>3. Maintenance</h4>
+                <p>Technicians address the issue and document actions taken.</p>
+            </div>
+        </div>
+        <div class="col-md-3 text-center mb-4">
+            <div class="bg-light p-3 rounded">
+                <i class="fas fa-check-circle fa-2x text-primary mb-3"></i>
+                <h4>4. Resolution</h4>
+                <p>The fault is marked as resolved, and the device status is updated.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

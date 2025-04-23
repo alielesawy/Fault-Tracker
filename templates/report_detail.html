@@ -1,0 +1,158 @@
+{% extends "layout.html" %}
+
+{% block title %}Report Details - Medical Device Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2>Fault Report #{{ report.report_id }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Device Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th scope="row">Device Name:</th>
+                                <td>{{ report.device.device_name }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Serial Number:</th>
+                                <td>{{ report.serial_number or report.device.serial_number }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Unit:</th>
+                                <td>{{ report.unit.unit_name }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Model:</th>
+                                <td>{{ report.device.model }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Status:</th>
+                                <td>
+                                    <span class="badge {% if report.device.status == 'Working' %}badge-working
+                                    {% elif report.device.status == 'Faulty' %}badge-faulty
+                                    {% elif report.device.status == 'Under Maintenance' %}badge-maintenance
+                                    {% else %}badge-out-of-service{% endif %}">
+                                        {{ report.device.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Report Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th scope="row">Reported:</th>
+                                <td>{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Status:</th>
+                                <td>
+                                    <span class="badge {% if report.status == 'Pending' %}badge-pending{% else %}badge-resolved{% endif %}">
+                                        {{ report.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% if report.technician %}
+                                <tr>
+                                    <th scope="row">Technician:</th>
+                                    <td>{{ report.technician.name }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if report.resolved_at %}
+                                <tr>
+                                    <th scope="row">Resolved:</th>
+                                    <td>{{ report.resolved_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Fault Description</h5>
+                    <div class="p-3 bg-light rounded">
+                        {% if report.fault_description %}
+                            {{ report.fault_description|nl2br }}
+                        {% else %}
+                            <em class="text-muted">No description provided</em>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if report.action_taken %}
+                    <div class="mb-4">
+                        <h5>Action Taken</h5>
+                        <div class="p-3 bg-light rounded">
+                            {{ report.action_taken|nl2br }}
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if report.status == 'Pending' %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Respond to Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('report_detail', report_id=report.report_id) }}">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="mb-3">
+                                    {{ form.action_taken.label(class="form-label") }} *
+                                    {{ form.action_taken(class="form-control" + (" is-invalid" if form.action_taken.errors else ""), rows=5, placeholder="Describe what action was taken to resolve the issue") }}
+                                    {% for error in form.action_taken.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    {{ form.submit(class="btn btn-primary") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('report_list') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Reports
+                    </a>
+                    
+                    <a href="{{ url_for('device_edit', device_id=report.device.device_id) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Device
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Unit Contact</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>{{ report.unit.unit_name }}</strong></p>
+                {% if report.unit.phone_numbers %}
+                    <p><i class="fas fa-phone me-2"></i>{{ report.unit.phone_numbers }}</p>
+                {% else %}
+                    <p class="text-muted"><i class="fas fa-phone me-2"></i>No phone number available</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Profile - Medical Device Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Your Profile</h2>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-user-circle fa-5x text-muted mb-3"></i>
+                        <h4>{{ current_user.name }}</h4>
+                        <p class="badge {% if current_user.role == 'Admin' %}bg-danger{% else %}bg-primary{% endif %}">
+                            {{ current_user.role }}
+                        </p>
+                        {% if current_user.unit %}
+                            <p class="text-muted">Unit: {{ current_user.unit.unit_name }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <form method="POST" action="{{ url_for('profile') }}">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control bg-light" value="{{ current_user.email }}" readonly>
+                                <div class="form-text">Your email cannot be changed.</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.name.label(class="form-label") }}
+                                {{ form.name(class="form-control" + (" is-invalid" if form.name.errors else "")) }}
+                                {% for error in form.name.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.phone_number.label(class="form-label") }}
+                                {{ form.phone_number(class="form-control" + (" is-invalid" if form.phone_number.errors else "")) }}
+                                {% for error in form.phone_number.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mt-4">
+                    <h4>Password Management</h4>
+                    <p>Need to change your password?</p>
+                    <a href="{{ url_for('reset_password_request') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-key me-2"></i>Reset Password
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block title %}Add Device - Medical Device Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="text-center">Add New Device</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('device_add') }}" class="needs-validation" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.serial_number.label(class="form-label") }} *
+                            {{ form.serial_number(class="form-control" + (" is-invalid" if form.serial_number.errors else ""), placeholder="Enter serial number") }}
+                            {% for error in form.serial_number.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.device_name.label(class="form-label") }} *
+                            {{ form.device_name(class="form-control" + (" is-invalid" if form.device_name.errors else ""), placeholder="Enter device name") }}
+                            {% for error in form.device_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.device_type.label(class="form-label") }} *
+                            {{ form.device_type(class="form-control" + (" is-invalid" if form.device_type.errors else ""), placeholder="Enter device type") }}
+                            {% for error in form.device_type.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.model.label(class="form-label") }} *
+                            {{ form.model(class="form-control" + (" is-invalid" if form.model.errors else ""), placeholder="Enter model") }}
+                            {% for error in form.model.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.unit_id.label(class="form-label") }} *
+                            {{ form.unit_id(class="form-select" + (" is-invalid" if form.unit_id.errors else "")) }}
+                            {% for error in form.unit_id.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.category.label(class="form-label") }} *
+                            {{ form.category(class="form-select" + (" is-invalid" if form.category.errors else "")) }}
+                            {% for error in form.category.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form.origin_country.label(class="form-label") }}
+                            {{ form.origin_country(class="form-control" + (" is-invalid" if form.origin_country.errors else ""), placeholder="Enter country of origin") }}
+                            {% for error in form.origin_country.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.status.label(class="form-label") }} *
+                            {{ form.status(class="form-select" + (" is-invalid" if form.status.errors else "")) }}
+                            {% for error in form.status.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""), rows=3, placeholder="Enter device description") }}
+                        {% for error in form.description.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

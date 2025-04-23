@@ -1,0 +1,246 @@
+/* AWS-inspired color scheme */
+:root {
+  --aws-orange: #FF9900;
+  --aws-white: #FFFFFF;
+  --aws-gray: #232F3E;
+  --aws-light-gray: #f7f7f7;
+  --aws-medium-gray: #d5dbdb;
+  --aws-dark-gray: #545b64;
+}
+
+body {
+  font-family: 'Amazon Ember', Arial, sans-serif;
+  background-color: var(--aws-light-gray);
+  color: var(--aws-gray);
+  margin: 0;
+  padding: 0;
+}
+
+/* Navigation bar styling */
+.navbar {
+  background-color: var(--aws-gray);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  color: var(--aws-orange) !important;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.navbar-nav .nav-link {
+  color: var(--aws-white) !important;
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--aws-orange) !important;
+}
+
+.navbar-toggler {
+  border-color: var(--aws-white);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--aws-orange);
+  border-color: var(--aws-orange);
+  color: var(--aws-white);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: #e68a00;
+  border-color: #e68a00;
+}
+
+.btn-secondary {
+  background-color: var(--aws-gray);
+  border-color: var(--aws-gray);
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+  background-color: #3a4554;
+  border-color: #3a4554;
+}
+
+/* Card styling */
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background-color: var(--aws-gray);
+  color: var(--aws-white);
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+  padding: 0.75rem 1.25rem;
+}
+
+.card-header h2, .card-header h3, .card-header h4 {
+  margin-bottom: 0;
+}
+
+/* Form styling */
+.form-control:focus {
+  border-color: var(--aws-orange);
+  box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-text {
+  color: var(--aws-dark-gray);
+}
+
+/* Table styling */
+.table {
+  background-color: var(--aws-white);
+}
+
+.table thead th {
+  background-color: var(--aws-gray);
+  color: var(--aws-white);
+  border-bottom: none;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(235, 238, 240, 0.5);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(255, 153, 0, 0.1);
+}
+
+/* Alert styling */
+.alert-success {
+  background-color: #edf7ed;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.alert-info {
+  background-color: #e6f7ff;
+  border-color: #b8daff;
+  color: #004085;
+}
+
+/* Dashboard cards */
+.dashboard-card {
+  background-color: var(--aws-white);
+  border-left: 4px solid var(--aws-orange);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card .card-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--aws-gray);
+}
+
+.dashboard-card .card-title {
+  font-size: 1rem;
+  color: var(--aws-dark-gray);
+  margin-bottom: 0;
+}
+
+/* Status badges */
+.badge-working {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-faulty {
+  background-color: #dc3545;
+  color: white;
+}
+
+.badge-maintenance {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-out-of-service {
+  background-color: #6c757d;
+  color: white;
+}
+
+.badge-pending {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.badge-resolved {
+  background-color: #28a745;
+  color: white;
+}
+
+/* Footer styling */
+footer {
+  background-color: var(--aws-gray);
+  color: var(--aws-white);
+  padding: 1.5rem 0;
+  margin-top: 2rem;
+}
+
+footer a {
+  color: var(--aws-orange);
+}
+
+footer a:hover {
+  color: #ffb84d;
+  text-decoration: none;
+}
+
+/* Home page hero section */
+.hero {
+  background-color: var(--aws-gray);
+  color: var(--aws-white);
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+}
+
+.hero h1 {
+  font-weight: bold;
+}
+
+.hero .btn-hero {
+  background-color: var(--aws-orange);
+  border-color: var(--aws-orange);
+  color: var(--aws-white);
+  padding: 0.6rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.hero .btn-hero:hover {
+  background-color: #e68a00;
+  border-color: #e68a00;
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  
+  .hero {
+    padding: 2rem 0;
+  }
+  
+  .dashboard-card .card-value {
+    font-size: 1.5rem;
+  }
+}

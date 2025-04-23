@@ -1,0 +1,319 @@
+{% extends "layout.html" %}
+
+{% block title %}Reports - Medical Device Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-date-range {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+    
+    .form-date-range .form-group {
+        flex-grow: 1;
+    }
+    
+    @media (max-width: 768px) {
+        .form-date-range {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h2>Report Generation</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('admin_reports') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.report_type.label(class="form-label") }}
+                    {{ form.report_type(class="form-select" + (" is-invalid" if form.report_type.errors else "")) }}
+                    {% for error in form.report_type.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-6 mb-3 form-date-range">
+                    <div class="form-group">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        {{ form.start_date(class="form-control" + (" is-invalid" if form.start_date.errors else ""), type="date") }}
+                        {% for error in form.start_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_date" class="form-label">End Date</label>
+                        {{ form.end_date(class="form-control" + (" is-invalid" if form.end_date.errors else ""), type="date") }}
+                        {% for error in form.end_date.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if report_data %}
+    {% if report_type == 'fault_reports' %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Fault Reports</h3>
+                <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print
+                </button>
+            </div>
+            <div class="card-body">
+                {% if report_data %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Device</th>
+                                    <th>Unit</th>
+                                    <th>Description</th>
+                                    <th>Action Taken</th>
+                                    <th>Status</th>
+                                    <th>Reported</th>
+                                    <th>Resolved</th>
+                                    <th>Technician</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report, device, unit, technician in report_data %}
+                                    <tr>
+                                        <td>{{ report.report_id }}</td>
+                                        <td>{{ device.device_name }}</td>
+                                        <td>{{ unit.unit_name }}</td>
+                                        <td>
+                                            {% if report.fault_description %}
+                                                {{ report.fault_description|truncate(50) }}
+                                            {% else %}
+                                                <span class="text-muted">No description</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if report.action_taken %}
+                                                {{ report.action_taken|truncate(50) }}
+                                            {% else %}
+                                                <span class="text-muted">No action taken</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if report.status == 'Pending' %}badge-pending{% else %}badge-resolved{% endif %}">
+                                                {{ report.status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            {% if report.resolved_at %}
+                                                {{ report.resolved_at.strftime('%Y-%m-%d %H:%M') }}
+                                            {% else %}
+                                                <span class="text-muted">Not resolved</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if technician %}
+                                                {{ technician.name }}
+                                            {% else %}
+                                                <span class="text-muted">Not assigned</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No fault reports found for the selected criteria.</div>
+                {% endif %}
+            </div>
+        </div>
+    {% elif report_type == 'device_inventory' %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>Device Inventory Summary</h3>
+                <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>Print
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5>Devices by Status</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Status</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for status, count in report_data.by_status %}
+                                                <tr>
+                                                    <td>{{ status }}</td>
+                                                    <td>{{ count }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5>Devices by Type</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for type, count in report_data.by_type %}
+                                                <tr>
+                                                    <td>{{ type }}</td>
+                                                    <td>{{ count }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5>Devices by Category</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for category, count in report_data.by_category %}
+                                                <tr>
+                                                    <td>{{ category }}</td>
+                                                    <td>{{ count }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Device Inventory Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Device Name</th>
+                                <th>Serial Number</th>
+                                <th>Type</th>
+                                <th>Model</th>
+                                <th>Unit</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for device, unit in report_data.devices %}
+                                <tr>
+                                    <td>{{ device.device_name }}</td>
+                                    <td>{{ device.serial_number }}</td>
+                                    <td>{{ device.device_type }}</td>
+                                    <td>{{ device.model }}</td>
+                                    <td>{{ unit.unit_name }}</td>
+                                    <td>{{ device.category }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if device.status == 'Working' %}badge-working
+                                            {% elif device.status == 'Faulty' %}badge-faulty
+                                            {% elif device.status == 'Under Maintenance' %}badge-maintenance
+                                            {% else %}badge-out-of-service{% endif %}">
+                                            {{ device.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Date range validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const reportTypeSelect = document.getElementById('report_type');
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        
+        // Show/hide date fields based on report type
+        if (reportTypeSelect) {
+            reportTypeSelect.addEventListener('change', function() {
+                const dateFields = document.querySelector('.form-date-range');
+                if (this.value === 'fault_reports') {
+                    dateFields.style.display = 'flex';
+                } else {
+                    dateFields.style.display = 'none';
+                }
+            });
+            
+            // Set initial state
+            const dateFields = document.querySelector('.form-date-range');
+            if (reportTypeSelect.value === 'fault_reports') {
+                dateFields.style.display = 'flex';
+            } else {
+                dateFields.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}
