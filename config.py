@@ -5,7 +5,7 @@ class Config:
     SECRET_KEY = os.environ.get('SESSION_SECRET', 'dev-secret-key')
     
     # Database settings
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///medical_device_management.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///medical_device_management.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Email settings
