@@ -5,8 +5,12 @@ class Config:
     SECRET_KEY = os.environ.get('SESSION_SECRET', 'dev-secret-key')
     
     # Database settings
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///medical_device_management.db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://user:pass@localhost:5432/medical_device_management')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
     
     # Email settings
     # Default is Gmail SMTP, but can be changed to SendGrid through API key

@@ -9,7 +9,6 @@ dependencies = [
     "flask>=3.1.0",
     "flask-sqlalchemy>=3.1.1",
     "gunicorn>=23.0.0",
-    
     "flask-wtf>=1.2.2",
     "itsdangerous>=2.2.0",
     "sqlalchemy>=2.0.40",
@@ -18,4 +17,5 @@ dependencies = [
     "sendgrid>=6.11.0",
     "pandas>=2.2.3",
     "openpyxl>=3.1.5",
+    "psycopg2-binary>=2.9.10",
 ]
