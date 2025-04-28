@@ -1,4 +1,5 @@
 from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask import render_template, redirect, url_for, flash, request, jsonify, abort, session
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import func
@@ -12,9 +13,11 @@ from forms import (
     ReportGenerationForm, DeviceFilterForm, ExcelUploadForm
 )
 from wtforms.validators import Optional, EqualTo
-from utils import send_password_reset_email, send_fault_notification_email, admin_required
+from utils import admin_required, send_password_reset_email, send_fault_notification_email
 from lang import set_locale, with_language, get_locale
 from config import Config
+
+bp = Blueprint('main', __name__)
 
 def register_routes(app):
     

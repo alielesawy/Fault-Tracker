@@ -19,6 +19,7 @@ def admin_required(f):
             flash('You need to be an admin to access this page.', 'danger')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__  # Preserve function name for Flask routing
     return decorated_function
 
 def send_email(subject, recipient, html_body):
@@ -71,7 +72,8 @@ def send_email(subject, recipient, html_body):
         return True
     except Exception as e:
         print(f"Failed to send email via SMTP: {e}")
-        return False
+        raise Exception(f"Failed to send email to {recipient}: {str(e)}")
+    return False
 
 def generate_reset_token(user):
     """Generate a token for password reset."""
@@ -181,7 +183,8 @@ def send_fault_notification_email(user, report):
     notification = Notification(
         report_id=report.report_id,
         user_id=user.user_id,
-        email_content=html_body
+        email_content=html_body,
+        sent_at=datetime.utcnow()
     )
     db.session.add(notification)
     db.session.commit()

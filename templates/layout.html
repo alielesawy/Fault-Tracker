@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts for Roboto (used in YouTube styling) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
@@ -16,10 +18,6 @@
     {% if is_rtl() %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.rtl.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            text-align: right;
-        }
         .dropdown-menu-end {
             left: 0;
             right: auto;
@@ -60,82 +58,47 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-heartbeat {% if is_rtl() %}ms-2{% else %}me-2{% endif %}"></i>{{ _('app_name') }}
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav {% if is_rtl() %}ms-auto{% else %}me-auto{% endif %}">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">{{ _('home') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('fault_report') }}">{{ _('report_fault') }}</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        {% if current_user.role == 'Admin' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('admin_dashboard') }}">{{ _('dashboard') }}</a>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ _('admin') }}
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" href="{{ url_for('admin_user_management') }}">{{ _('user_management') }}</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('admin_unit_management') }}">{{ _('unit_management') }}</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('admin_reports') }}">{{ _('reports') }}</a></li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('report_list') }}">{{ _('fault_reports') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('device_list') }}">{{ _('devices') }}</a>
-                        </li>
-                    {% endif %}
-                </ul>
-                <ul class="navbar-nav">
-                    <!-- Language Switcher -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-language {% if is_rtl() %}ms-1{% else %}me-1{% endif %}"></i>
-                            {% if get_locale() == 'ar' %}العربية{% else %}English{% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for('set_language', lang='ar') }}">العربية</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('set_language', lang='en') }}">English</a></li>
-                        </ul>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user {% if is_rtl() %}ms-1{% else %}me-1{% endif %}"></i>{{ current_user.name }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{{ url_for('profile') }}">{{ _('profile') }}</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">{{ _('logout') }}</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">{{ _('login') }}</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+    <!-- YouTube-style Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-heartbeat {% if is_rtl() %}ms-2{% else %}me-2{% endif %}"></i>{{ _('app_name') }}
         </div>
-    </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="{{ _('search_placeholder') }}">
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">{{ _('home') }}</a>
+            <a href="{{ url_for('fault_report') }}">{{ _('report_fault') }}</a>
+            {% if current_user.is_authenticated %}
+                {% if current_user.role == 'Admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}">{{ _('dashboard') }}</a>
+                    <a href="{{ url_for('admin_user_management') }}">{{ _('user_management') }}</a>
+                    <a href="{{ url_for('admin_unit_management') }}">{{ _('unit_management') }}</a>
+                    <a href="{{ url_for('admin_reports') }}">{{ _('reports') }}</a>
+                {% endif %}
+                <a href="{{ url_for('report_list') }}">{{ _('fault_reports') }}</a>
+                <a href="{{ url_for('device_list') }}">{{ _('devices') }}</a>
+                <a href="{{ url_for('profile') }}">
+                    <i class="fas fa-user {% if is_rtl() %}ms-1{% else %}me-1{% endif %}"></i>{{ current_user.name }}
+                </a>
+                <a href="{{ url_for('logout') }}">{{ _('logout') }}</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">{{ _('login') }}</a>
+            {% endif %}
+            <!-- Language Switcher -->
+            <a href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-language {% if is_rtl() %}ms-1{% else %}me-1{% endif %}"></i>
+                {% if get_locale() == 'ar' %}العربية{% else %}English{% endif %}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('set_language', lang='ar') }}">العربية</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('set_language', lang='en') }}">English</a></li>
+            </ul>
+        </div>
+    </header>
     
     <!-- Flash messages -->
-    <div class="container mt-3">
+    <div class="container mt-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -156,7 +119,7 @@
     <!-- Footer -->
     <footer class="py-3">
         <div class="container text-center">
-            <p>&copy; {{ now.year }} {{ _('app_name') }}. {{ _('copyright') }}</p>
+            <p>© {{ now.year }} {{ _('app_name') }}. {{ _('copyright') }}</p>
         </div>
     </footer>
     

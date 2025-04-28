@@ -6,27 +6,27 @@
 <!-- Hero section -->
 <section class="hero">
     <div class="container text-center py-5">
-        <h1 class="display-4 mb-4">Medical Device Fault Management</h1>
+        <h1 class="display-4 mb-4" style="color: var(--primary-color);">Medical Device Fault Management</h1>
         <p class="lead mb-4">A comprehensive solution for reporting and managing medical device faults in healthcare facilities.</p>
-        <a href="{{ url_for('fault_report') }}" class="btn btn-hero btn-lg">Report a Fault</a>
+        <a href="{{ url_for('fault_report') }}" class="btn btn-lg">Report a Fault</a>
     </div>
 </section>
 
 <!-- Main features -->
-<section class="container">
+<section class="container mt-5">
     <div class="row">
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="card">
                 <div class="card-body text-center">
-                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--primary-color);"></i>
                     <h3 class="card-title">Report Faults</h3>
                     <p class="card-text">Quickly report issues with medical devices to ensure they get immediate attention.</p>
-                    <a href="{{ url_for('fault_report') }}" class="btn btn-primary">Report Now</a>
+                    <a href="{{ url_for('fault_report') }}" class="btn">Report Now</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="card">
                 <div class="card-body text-center">
                     <i class="fas fa-clipboard-list fa-3x text-primary mb-3"></i>
                     <h3 class="card-title">Track Devices</h3>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div class="col-md-4 mb-4">
-            <div class="card h-100">
+            <div class="card">
                 <div class="card-body text-center">
                     <i class="fas fa-chart-bar fa-3x text-success mb-3"></i>
                     <h3 class="card-title">Generate Reports</h3>

@@ -1,15 +1,18 @@
 /* 
- * Custom CSS for Medical Device Management System
+ * Dark YouTube-inspired CSS for Medical Device Management System
  * With Arabic RTL support and responsive design
  */
 
 /* Base styles */
 :root {
-  --primary-color: #FF9900;
-  --secondary-color: #232F3E;
-  --light-color: #FFFFFF;
-  --gray-color: #f8f9fa;
-  --border-color: #e6e6e6;
+  --primary-color: #FF0000; /* YouTube Red */
+  --secondary-color: #FFFFFF; /* White for Text */
+  --light-color: #212121; /* Dark Gray for Cards and Header */
+  --gray-color: #181818; /* Darker Gray for Background */
+  --border-color: #303030; /* Dark Border */
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Darker Shadow */
+  --text-color: #FFFFFF; /* White Text */
+  --secondary-text: #AAAAAA; /* Light Gray Text */
 }
 
 @font-face {
@@ -21,55 +24,125 @@
 }
 
 body {
-  font-family: 'FS Albert Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'FS Albert Arabic', 'Roboto', Arial, sans-serif;
+  background-color: var(--gray-color) !important; /* Ensure dark background */
+  color: var(--text-color) !important; /* Ensure white text */
+  margin: 0;
+  padding: 0;
 }
 
-/* Navbar styling */
-.navbar {
-  background-color: var(--secondary-color);
+/* Header (Dark YouTube-style) */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--light-color);
+  padding: 10px 20px;
+  box-shadow: var(--shadow);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
-.navbar-brand {
+.header .logo {
+  font-size: 24px;
   font-weight: bold;
-  color: var(--primary-color) !important;
+  color: var(--primary-color);
 }
 
-.nav-link {
-  color: var(--light-color) !important;
-  transition: all 0.3s ease;
+.header .search-bar {
+  flex: 1;
+  margin: 0 20px;
 }
 
-.nav-link:hover {
-  color: var(--primary-color) !important;
+.header .search-bar input {
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: 16px;
+  background-color: #121212;
+  color: var(--text-color);
 }
 
+.header .search-bar input::placeholder {
+  color: var(--secondary-text);
+}
+
+.header .nav-links a {
+  margin-left: 20px;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.header .nav-links a:hover {
+  color: var(--primary-color);
+}
+
+/* Dropdown Menu */
 .dropdown-menu {
-  border-radius: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown-item:active {
-  background-color: var(--primary-color);
-}
-
-/* Footer styling */
-footer {
-  background-color: var(--secondary-color);
-  color: var(--light-color);
-}
-
-/* Cards and panels */
-.card {
-  border-radius: 6px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1.5rem;
+  background-color: var(--light-color);
   border: 1px solid var(--border-color);
 }
 
+.dropdown-item {
+  color: var(--text-color);
+}
+
+.dropdown-item:hover {
+  background-color: #303030;
+}
+
+/* Main Content */
+.container {
+  margin-top: 80px; /* Space for fixed header */
+  padding: 20px;
+}
+
+/* Cards */
+.card {
+  background-color: var(--light-color) !important; /* Override Bootstrap */
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: none;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
 .card-header {
-  background-color: var(--gray-color);
-  border-bottom: 1px solid var(--border-color);
-  font-weight: bold;
+  background-color: transparent;
+  border-bottom: none;
+  color: var(--text-color);
+}
+
+.card h2, .card h3 {
+  color: var(--text-color);
+}
+
+.card p {
+  color: var(--secondary-text);
+}
+
+/* Buttons */
+.btn {
+  background-color: var(--primary-color);
+  color: var(--light-color);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #CC0000; /* Darker Red */
 }
 
 .btn-primary {
@@ -78,11 +151,11 @@ footer {
 }
 
 .btn-primary:hover {
-  background-color: darken(var(--primary-color), 10%);
-  border-color: darken(var(--primary-color), 10%);
+  background-color: #CC0000;
+  border-color: #CC0000;
 }
 
-/* Dashboard cards */
+/* Dashboard cards (Stats Cards) */
 .stats-card {
   border-radius: 8px;
   margin-bottom: 1.5rem;
@@ -90,105 +163,128 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  background-color: var(--light-color);
+  box-shadow: var(--shadow);
 }
 
 .stats-card .value {
   font-size: 2rem;
   font-weight: bold;
+  color: var(--text-color);
 }
 
 .stats-card .title {
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--secondary-text);
 }
 
-/* Form styling */
-.form-control:focus {
+/* Forms */
+.form-control, .form-select {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: 'FS Albert Arabic', 'Roboto', Arial, sans-serif;
+  background-color: #121212 !important; /* Override Bootstrap */
+  color: var(--text-color) !important;
+}
+
+.form-control:focus, .form-select:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.2rem rgba(255, 153, 0, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.25); /* YouTube Red focus */
+}
+
+.form-control::placeholder {
+  color: var(--secondary-text);
+}
+
+.form-text {
+  color: var(--secondary-text);
 }
 
 /* Tables */
 .table {
-  border-radius: 6px;
-  overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--light-color);
+  border: 1px solid var(--border-color);
 }
 
-.table thead th {
-  background-color: var(--gray-color);
-  border-bottom: 2px solid var(--border-color);
-  font-weight: 600;
+.table th, .table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
 }
 
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-  .container {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-  
-  .stats-card {
-    min-height: 100px;
-  }
-  
-  .card-body {
-    padding: 1rem;
-  }
-  
-  .table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-  }
-  
-  .navbar-brand {
-    font-size: 1.1rem;
-  }
+.table th {
+  background-color: #303030;
+  color: var(--text-color);
 }
 
-/* RTL specific style overrides */
-[dir="rtl"] {
-  text-align: right;
+.table tr:hover {
+  background-color: #303030;
 }
 
-[dir="rtl"] .dropdown-menu {
-  text-align: right;
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #282828;
 }
 
-[dir="rtl"] .form-check {
-  padding-right: 1.25rem;
-  padding-left: 0;
+/* Pagination */
+.page-link {
+  background-color: var(--light-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
 }
 
-[dir="rtl"] .form-check-input {
-  margin-right: -1.25rem;
-  margin-left: 0;
+.page-link:hover {
+  background-color: #303030;
+  color: var(--primary-color);
 }
 
-/* Arabic font improvements */
-[dir="rtl"] body {
-  font-family: 'FS Albert Arabic', 'Segoe UI', 'Arial', 'Tahoma', sans-serif;
-  font-size: 1.02rem;
-  line-height: 1.6;
+.page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--light-color);
 }
 
-/* Report cards */
+.page-item.disabled .page-link {
+  background-color: var(--light-color);
+  color: var(--secondary-text);
+}
+
+/* Alerts */
+.alert {
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.alert-info {
+  background-color: #1A3C5E;
+  color: #AED4FB;
+}
+
+.alert-success {
+  background-color: #1A3C1E;
+  color: #AED4AF;
+}
+
+.alert-danger {
+  background-color: #5E1A1A;
+  color: #FBAEAE;
+}
+
+.btn-close {
+  filter: invert(1); /* Makes the close button white for dark theme */
+}
+
+/* Report Cards */
 .report-card {
-  border-left: 4px solid var(--primary-color);
+  border-right: 4px solid var(--primary-color); /* Adjusted for RTL */
 }
 
-[dir="rtl"] .report-card {
-  border-left: none;
-  border-right: 4px solid var(--primary-color);
-}
-
-/* RTL table adjustments */
-[dir="rtl"] .table th,
-[dir="rtl"] .table td {
-  text-align: right;
-}
-
-/* Device status colors */
+/* Device Status Colors */
 .status-working {
   color: #28a745;
 }
@@ -205,7 +301,7 @@ footer {
   color: #6c757d;
 }
 
-/* Report status */
+/* Report Status */
 .status-pending {
   font-weight: bold;
   color: #ffc107;
@@ -224,7 +320,7 @@ footer {
   display: inline-block;
 }
 
-/* Fix for status text on white background */
+/* Badges */
 .badge {
   padding: 5px 10px;
   border-radius: 4px;
@@ -253,12 +349,97 @@ footer {
   background-color: #6c757d;
 }
 
-/* Language switcher */
-.language-dropdown .dropdown-item {
-  padding: 0.5rem 1rem;
+/* Footer */
+footer {
+  background-color: var(--light-color);
+  color: var(--text-color);
 }
 
-/* RTL form group */
+/* RTL Specific Style Overrides */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .dropdown-menu {
+  text-align: right;
+}
+
+[dir="rtl"] .form-check {
+  padding-right: 1.25rem;
+  padding-left: 0;
+}
+
+[dir="rtl"] .form-check-input {
+  margin-right: -1.25rem;
+  margin-left: 0;
+}
+
+[dir="rtl"] body {
+  font-family: 'FS Albert Arabic', 'Roboto', Arial, sans-serif;
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+[dir="rtl"] .report-card {
+  border-left: none;
+  border-right: 4px solid var(--primary-color);
+}
+
+[dir="rtl"] .table th,
+[dir="rtl"] .table td {
+  text-align: right;
+}
+
 [dir="rtl"] .form-label {
   text-align: right;
+}
+
+[dir="rtl"] .header .nav-links a {
+  margin-left: 0;
+  margin-right: 20px;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .header .search-bar {
+    margin: 10px 0;
+  }
+
+  .header .nav-links {
+    margin-top: 10px;
+  }
+
+  .header .nav-links a {
+    margin-right: 10px;
+  }
+
+  .card {
+    margin-bottom: 15px;
+  }
+
+  .container {
+    margin-top: 120px; /* Adjust for stacked header */
+  }
+}
+
+/* Additional Dark Theme Adjustments */
+.bg-light {
+  background-color: var(--light-color) !important;
+}
+
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-success {
+  color: #28a745 !important;
+}
+
+.text-muted {
+  color: var(--secondary-text) !important;
 }
